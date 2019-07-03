@@ -1,4 +1,4 @@
-package exception;
+package io.exceptions;
 
 public class InvalidMoveException extends Exception {
 

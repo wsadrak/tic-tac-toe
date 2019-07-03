@@ -1,5 +1,6 @@
 package model;
 
+
 public class Board {
 	private static final int SIZE = 3;
 	private Symbol[][] symbols = new Symbol[SIZE][SIZE];

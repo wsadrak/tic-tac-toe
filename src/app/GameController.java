@@ -2,7 +2,8 @@ package app;
 
 import java.util.Random;
 
-import exception.InvalidMoveException;
+import io.ConsolePrinter;
+import io.exceptions.InvalidMoveException;
 import model.Board;
 import model.Coordinate;
 import model.GameState;
@@ -13,13 +14,15 @@ import model.players.Player;
 import model.players.UserPlayer;
 
 public class GameController {
+	private ConsolePrinter printer = new ConsolePrinter();
+
 	private Player user = new UserPlayer();
 	private Player computer = new CpuPlayer();
 	private Player currentPlayer;
-	private GameState statusGry;
 
-	private Board gameBoard;
-	private int round = 0;
+	private GameState gameState = GameState.IN_PROGRES;
+	private Board gameBoard = new Board();
+	private int madeMoves = 0;
 
 	public GameController() {
 		setupGame();
@@ -27,9 +30,6 @@ public class GameController {
 
 	private void setupGame() {
 		currentPlayer = generateWhoStarts();
-		System.out.println(currentPlayer);
-		gameBoard = new Board();
-		statusGry = GameState.IN_PROGRES;
 	}
 
 	private Player generateWhoStarts() {
@@ -37,143 +37,29 @@ public class GameController {
 		int temporaryValue = random.nextInt(2);
 
 		if (temporaryValue == 0) {
-			System.out.println("Zaczyna komputer");
 			return new CpuPlayer();
 		} else {
-			System.out.println("Zaczyna u¿ytkownik");
 			return new UserPlayer();
 		}
 	}
 
 	public void mainLoop() {
-
-		drawBoard();
-
-		// TODO - zrobiæ pêtlê
-		while (statusGry == GameState.IN_PROGRES) {
-			System.out.println("Runda " + (round+1));
+		while (gameState == GameState.IN_PROGRES) {
+			printRound();
 			nextMove();
 			drawBoard();
 			switchPlayer();
 			updateStatus();
 		}
-
 	}
 
-	private void updateStatus() {
-		// TODO Auto-generated method stub
-		Symbol winner = Symbol.EMPTY;
-
-		/*
-		 * diagonal 1
-		 */
-		if (gameBoard.getSymbols()[0][0] == gameBoard.getSymbols()[1][1]
-				&& gameBoard.getSymbols()[1][1] == gameBoard.getSymbols()[2][2]
-				&& gameBoard.getSymbols()[0][0] != Symbol.EMPTY) {
-//			System.out.println("");
-			winner = gameBoard.getSymbols()[0][0];
-			System.out.println("Diagonal 1 " + winner);
-		}
-
-		/*
-		 * diagonal 2
-		 */
-		if (gameBoard.getSymbols()[0][2] == gameBoard.getSymbols()[1][1]
-				&& gameBoard.getSymbols()[1][1] == gameBoard.getSymbols()[2][0]
-				&& gameBoard.getSymbols()[0][2] != Symbol.EMPTY) {
-			winner = gameBoard.getSymbols()[0][2];
-			System.out.println("Diagonal 2 " + winner);
-		}
-
-		/*
-		 * horizontal 0
-		 */
-		if (gameBoard.getSymbols()[0][0] == gameBoard.getSymbols()[0][1]
-				&& gameBoard.getSymbols()[0][1] == gameBoard.getSymbols()[0][2]
-				&& gameBoard.getSymbols()[0][0] != Symbol.EMPTY) {
-			winner = gameBoard.getSymbols()[0][0];
-			System.out.println("Horizontal 0 " + winner);
-		}
-
-		/*
-		 * horizontal 1
-		 */
-		if (gameBoard.getSymbols()[1][0] == gameBoard.getSymbols()[1][1]
-				&& gameBoard.getSymbols()[1][1] == gameBoard.getSymbols()[1][2]
-				&& gameBoard.getSymbols()[1][0] != Symbol.EMPTY) {
-			winner = gameBoard.getSymbols()[1][0];
-			System.out.println("Horizontal 1 " + winner);
-		}
-
-		/*
-		 * horizontal 2
-		 */
-		if (gameBoard.getSymbols()[2][0] == gameBoard.getSymbols()[2][1]
-				&& gameBoard.getSymbols()[2][1] == gameBoard.getSymbols()[2][2]
-				&& gameBoard.getSymbols()[2][0] != Symbol.EMPTY) {
-			winner = gameBoard.getSymbols()[2][0];
-			System.out.println("Horizontal 2 " + winner);
-		}
-
-		/*
-		 * vertical 0
-		 */
-		if (gameBoard.getSymbols()[0][0] == gameBoard.getSymbols()[1][0]
-				&& gameBoard.getSymbols()[1][0] == gameBoard.getSymbols()[2][0]
-				&& gameBoard.getSymbols()[0][0] != Symbol.EMPTY) {
-			winner = gameBoard.getSymbols()[0][0];
-			System.out.println("Vertical 0 " + winner);
-		}
-
-		/*
-		 * vertical 1
-		 */
-		if (gameBoard.getSymbols()[0][1] == gameBoard.getSymbols()[1][1]
-				&& gameBoard.getSymbols()[1][1] == gameBoard.getSymbols()[2][1]
-				&& gameBoard.getSymbols()[0][1] != Symbol.EMPTY) {
-			winner = gameBoard.getSymbols()[0][1];
-			System.out.println("Vertical 1 " + winner);
-		}
-
-		/*
-		 * vertical 2
-		 */
-		if (gameBoard.getSymbols()[0][2] == gameBoard.getSymbols()[1][2]
-				&& gameBoard.getSymbols()[1][2] == gameBoard.getSymbols()[2][2]
-				&& gameBoard.getSymbols()[0][2] != Symbol.EMPTY) {
-			winner = gameBoard.getSymbols()[0][2];
-			System.out.println("Vertical 2 " + winner);
-		}
-
-		if (winner == Symbol.CROSS) {
-			System.out.println("GAME OVER: USER WINS");
-			statusGry = GameState.WIN;
-		} else if (winner == Symbol.NOUGHT) {
-			System.out.println("GAME OVER: COMPUTER WINS");
-			statusGry = GameState.LOSE;
-		} else if (round == 9) {
-			System.out.println("GAME OVER: DRAW");
-			statusGry = GameState.DRAW;
-		} else {
-			System.out.println("Game in progress");
-		}
-
-	}
-
-	private void switchPlayer() {
-		System.out.print("Switching from " + currentPlayer + " to ");
-		if (currentPlayer instanceof UserPlayer) {
-			currentPlayer = computer;
-		} else if (currentPlayer instanceof CpuPlayer) {
-			currentPlayer = user;
-		}
-		System.out.println(currentPlayer);
-
+	private void printRound() {
+		printer.printNextLine("Round " + (madeMoves + 1));
 	}
 
 	private void nextMove() {
 		Move move = null;
-		System.out.println("Next move: " + currentPlayer);
+		printer.printNextLine("Move: " + currentPlayer);
 		boolean isValidationCorrect = false;
 		while (!isValidationCorrect) {
 			try {
@@ -181,19 +67,13 @@ public class GameController {
 				isValidationCorrect = validate(move);
 			} catch (InvalidMoveException | NumberFormatException | ArrayIndexOutOfBoundsException e) {
 				if (currentPlayer instanceof UserPlayer) {
-					System.err.println("niepoprawny ruch, spróbuj jeszcze raz");
+					System.err.println("Incorrect move. Please try again.");
 				}
+			} finally {
+				printer.printNextLine("");
 			}
 		}
-		System.out.println("Round: " + round);
 		updateBoard(move);
-	}
-
-	private void updateBoard(Move move) {
-		Symbol symbol = move.getSymbol();
-		Coordinate coordinate = move.getCoordinate();
-
-		gameBoard.setSymbolAt(symbol, coordinate);
 	}
 
 	private boolean validate(Move move) throws InvalidMoveException {
@@ -205,15 +85,120 @@ public class GameController {
 
 		if (symbolAtPosition == Symbol.EMPTY) {
 			isMoveValid = true;
-			round++;
+			madeMoves++;
 		} else {
-			throw new InvalidMoveException("Pole jest zajête");
+			throw new InvalidMoveException("Incorrect move");
 		}
 		return isMoveValid;
 	}
 
+	private void updateBoard(Move move) {
+		Symbol symbol = move.getSymbol();
+		Coordinate coordinate = move.getCoordinate();
+		gameBoard.setSymbolAt(symbol, coordinate);
+	}
+
 	private void drawBoard() {
 		gameBoard.printBoard();
+	}
+
+	private void switchPlayer() {
+		if (currentPlayer instanceof UserPlayer) {
+			currentPlayer = computer;
+		} else if (currentPlayer instanceof CpuPlayer) {
+			currentPlayer = user;
+		}
+	}
+
+	private void updateStatus() {
+
+		Symbol winnerSymbol = validatePositions();
+		if (winnerSymbol == Symbol.CROSS) {
+			printer.printNextLine("GAME OVER: USER WINS");
+			gameState = GameState.WIN;
+		} else if (winnerSymbol == Symbol.NOUGHT) {
+			printer.printNextLine("GAME OVER: COMPUTER WINS");
+			gameState = GameState.LOSE;
+		} else if (madeMoves == 9) {
+			printer.printNextLine("GAME OVER: DRAW");
+			gameState = GameState.DRAW;
+		}
+	}
+
+	private Symbol validatePositions() {
+		Symbol winner = Symbol.EMPTY;
+		/*
+		 * diagonal 1
+		 */
+		if (gameBoard.getSymbols()[0][0] == gameBoard.getSymbols()[1][1]
+				&& gameBoard.getSymbols()[1][1] == gameBoard.getSymbols()[2][2]
+				&& gameBoard.getSymbols()[0][0] != Symbol.EMPTY) {
+			winner = gameBoard.getSymbols()[0][0];
+		}
+
+		/*
+		 * diagonal 2
+		 */
+		if (gameBoard.getSymbols()[0][2] == gameBoard.getSymbols()[1][1]
+				&& gameBoard.getSymbols()[1][1] == gameBoard.getSymbols()[2][0]
+				&& gameBoard.getSymbols()[0][2] != Symbol.EMPTY) {
+			winner = gameBoard.getSymbols()[0][2];
+		}
+
+		/*
+		 * horizontal 0
+		 */
+		if (gameBoard.getSymbols()[0][0] == gameBoard.getSymbols()[0][1]
+				&& gameBoard.getSymbols()[0][1] == gameBoard.getSymbols()[0][2]
+				&& gameBoard.getSymbols()[0][0] != Symbol.EMPTY) {
+			winner = gameBoard.getSymbols()[0][0];
+		}
+
+		/*
+		 * horizontal 1
+		 */
+		if (gameBoard.getSymbols()[1][0] == gameBoard.getSymbols()[1][1]
+				&& gameBoard.getSymbols()[1][1] == gameBoard.getSymbols()[1][2]
+				&& gameBoard.getSymbols()[1][0] != Symbol.EMPTY) {
+			winner = gameBoard.getSymbols()[1][0];
+		}
+
+		/*
+		 * horizontal 2
+		 */
+		if (gameBoard.getSymbols()[2][0] == gameBoard.getSymbols()[2][1]
+				&& gameBoard.getSymbols()[2][1] == gameBoard.getSymbols()[2][2]
+				&& gameBoard.getSymbols()[2][0] != Symbol.EMPTY) {
+			winner = gameBoard.getSymbols()[2][0];
+		}
+
+		/*
+		 * vertical 0
+		 */
+		if (gameBoard.getSymbols()[0][0] == gameBoard.getSymbols()[1][0]
+				&& gameBoard.getSymbols()[1][0] == gameBoard.getSymbols()[2][0]
+				&& gameBoard.getSymbols()[0][0] != Symbol.EMPTY) {
+			winner = gameBoard.getSymbols()[0][0];
+		}
+
+		/*
+		 * vertical 1
+		 */
+		if (gameBoard.getSymbols()[0][1] == gameBoard.getSymbols()[1][1]
+				&& gameBoard.getSymbols()[1][1] == gameBoard.getSymbols()[2][1]
+				&& gameBoard.getSymbols()[0][1] != Symbol.EMPTY) {
+			winner = gameBoard.getSymbols()[0][1];
+		}
+
+		/*
+		 * vertical 2
+		 */
+		if (gameBoard.getSymbols()[0][2] == gameBoard.getSymbols()[1][2]
+				&& gameBoard.getSymbols()[1][2] == gameBoard.getSymbols()[2][2]
+				&& gameBoard.getSymbols()[0][2] != Symbol.EMPTY) {
+			winner = gameBoard.getSymbols()[0][2];
+		}
+		return winner;
 	}
 
 }

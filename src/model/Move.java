@@ -2,6 +2,8 @@ package model;
 
 public class Move {
 	private Coordinate coordinate;
+	private Symbol symbol;
+
 	public Coordinate getCoordinate() {
 		return coordinate;
 	}
@@ -10,13 +12,9 @@ public class Move {
 		return symbol;
 	}
 
-	private Symbol symbol;
-	
 	public Move(Coordinate coordinate, Symbol symbol) {
 		this.coordinate = coordinate;
 		this.symbol = symbol;
 	}
-	
-	
 
 }

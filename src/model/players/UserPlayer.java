@@ -22,9 +22,9 @@ public class UserPlayer implements Player {
 	}
 
 	private Coordinate getCoordinate() {
-		System.out.println("Podaj wiersz: ");
+		printer.printNextLine("Type a row [0-2]: " );
 		int row = Integer.parseInt(input.nextLine());
-		System.out.println("Podaj kolumnê: ");
+		printer.printNextLine("Type a column [0-2]: " );
 		int column = Integer.parseInt(input.nextLine());
 		return new Coordinate(row, column);
 	}
